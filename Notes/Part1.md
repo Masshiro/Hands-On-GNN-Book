@@ -104,5 +104,52 @@ Two major components of DeepWalk architecture:
 - Word2Vec
 - Random walks
 
-## 3.2 Introducing Word2Vec
+## 3.2 Word2Vec
+
+### 3.2.1 Intro
+
+- A technique to translate words into <u>*vectors*</u> (also known as embeddings)
+- Cosine similarity can be used to measure the likeness of these words
+
+### 3.2.2 CBOW vs skip-gram
+
+- A model must be trined on a pretext task to produce these vectors
+- its only goal is to produce high-quality embeddings
+
+Two architectures with similar tasks:
+
+- **The continuous bag-of-words (CBOW) model**: This is trained to predict a word using its <u>*surrounding context*</u>
+- **The continuous skip-gram model**: feed a single word to the model and try to predict the words around it.
+
+### 3.2.3 Creating skip-gram
+
+- Skip-grams are implemented as pairs of words `(target word, context word)`
+	- `target word`: the input
+	- `context word`: the word to predict
+- The number of skip grams for the same target word depends on a parameter called **<u>*context size*</u>**
+
+### 3.2.4 The skip-gram model
+
+- Goal: to produce high-quality word embeddings
+
+	- Maximize the sum of every probability of seeing a context word given a target word in an entire text ($c$ is the size of the context vector):
+		$$
+		\frac{1}{N}\sum_{n=1}^{N}\sum_{-c\le j\le c,j\ne0} \log p(w_{n+1}\vert w_n)
+		$$
+
+- Why $\log$ ?: 
+
+	- products become additions, and multiplications are more computationally expensive than additions
+	- The way computers store very small numbers (such as 3.14e-128) is not perfectly accurate, unlike the log of the same numbers (-127.5 in this case). These small errors can add up and bias the final results when events are extremely unlikely.
+
+- The basic skip-gram model uses the **<u>*softmax*</u>** function to calculate the probability of a context word embedding $h_c$ given a target word embedding $h_t$:
+
+	- $$
+		p(w_c\vert w_t)=\frac{\exp(h_ch_t^\top)}{\sum_{i=1}^{\vert V\vert}\exp(h_i h_t^\top)}
+		$$
+
+- Only two layers
+
+	- **Projection layer** with a weight matrix $W_{embed}$, which takes a one-hot encoded-word vector as an input and returns the corresponding $N$-dim word embedding. It acts as a simple lookup table that stores embeddings of a predefined dimensionality
+	- **Fully connected layer** with a  weight matrix $W_{output}$, which takes a word embedding as input and outputs $\vert V\vert$-dim logits. A softmax function is applied to these predictions to transform logits into probabilities.
 
