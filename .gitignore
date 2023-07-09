@@ -1,2 +1,4 @@
 .DS_Store
 ml-100k/
+processed/
+raw/
