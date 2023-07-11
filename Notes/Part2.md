@@ -139,7 +139,7 @@ https://gephi.org/
 - Weighting factors: attention scores between node $i$ and $j$:  $\alpha_{ij}$
 
 	- $$
-		h_i=\sum_{j\in\mathcal{N}_i}\alpha_{ij}Wx_j
+		h_i=\sum_{j\in\mathcal{N}_i}\alpha_{ij}\mathbf{W}x_j
 		$$
 
 - Four steps to calculate scores & how to make improvement to layer:
@@ -155,18 +155,16 @@ https://gephi.org/
 - Attention score represents: importance btw a central node $i$ and a neighbor $j$
 
 	- Requires node features from both nodes
-	- Represented by a concatenation btw hidden vectors $Wx_i$ and $Wx_j$
-		- $W$: classic shared weight matrix to compute hidden vectors
+	- Represented by a concatenation btw hidden vectors $\mathbf{W}x_i$ and $\mathbf{W}x_j$
+		- $\mathbf{W}$: classic shared weight matrix to compute hidden vectors
 
 - An additional linear transformation is applied to the result with a learnable weight matrix $W_{att}$
 
 	- During training, matrix learns weights to produce attention coefficients $a_{ij}$
 
 - $$
-	a_{ij}=W_{att}^\top[Wx_i\vert\vert Wx_j]
+	a_{ij}=W_{att}^\top[\mathbf{W}x_i\vert\vert \mathbf{W}x_j]
 	$$
-
-- 
 
 ## 7.2 Activation Function
 
@@ -204,12 +202,12 @@ https://gephi.org/
 
 	- <u>*Averaging*</u>:
 		$$
-		h_i=\frac{1}{n}\sum_{k=1}^{n}h_i^k=\frac{1}{n}\sum_{k=1}^{n}\sum_{j\in\mathcal{N}_i}\alpha_{ij}^kW^kx_j
+		h_i=\frac{1}{n}\sum_{k=1}^{n}h_i^k=\frac{1}{n}\sum_{k=1}^{n}\sum_{j\in\mathcal{N}_i}\alpha_{ij}^k\mathbf{W}^kx_j
 		$$
 
 	- <u>*Concatenation*</u>:
 		$$
-		h_i=\vert\vert_{k=1}^{n}h_i^k=\vert\vert_{k=1}^n \sum_{j\in\mathcal{N}_i}\alpha_{ij}^kW^kx_j
+		h_i=\vert\vert_{k=1}^{n}h_i^k=\vert\vert_{k=1}^n \sum_{j\in\mathcal{N}_i}\alpha_{ij}^k\mathbf{W}^kx_j
 		$$
 
 - In practice
@@ -237,12 +235,12 @@ https://gephi.org/
 
 	- GAT:
 		$$
-		\alpha_{ij}=\frac{\exp(LeackReLU(W_{att}^\top[Wx_i\vert\vert Wx_j]))}{\sum_{k\in\mathcal{N}_i}\exp(LeakyReLU(W_{att}^\top[Wx_i\vert\vert Wx_k]))}
+		\alpha_{ij}=\frac{\exp(LeackReLU(W_{att}^\top[\mathbf{W}x_i\vert\vert \mathbf{W}x_j]))}{\sum_{k\in\mathcal{N}_i}\exp(LeakyReLU(W_{att}^\top[\mathbf{W}x_i\vert\vert \mathbf{W}x_k]))}
 		$$
 
 	- GATv2:
 		$$
-		\alpha_{ij}=\frac{\exp(W_{att}^\top LeackReLU(W[x_i\vert\vert x_j]))}{\sum_{k\in\mathcal{N}_i}\exp(W_{att}^\top LeakyReLU(W[x_i\vert\vert x_k]))}
+		\alpha_{ij}=\frac{\exp(W_{att}^\top LeackReLU(\mathbf{W}[x_i\vert\vert x_j]))}{\sum_{k\in\mathcal{N}_i}\exp(W_{att}^\top LeakyReLU(\mathbf{W}[x_i\vert\vert x_k]))}
 		$$
 
 ## 7.6 Implementation in `NumPy`
