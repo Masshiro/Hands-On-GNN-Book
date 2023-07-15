@@ -105,5 +105,4 @@ $$
 \partial_{o_j} l(\mathbf{y},\mathbf{\hat{y}})=\frac{\exp(o_j)}{\sum_{k=1}^q\exp(o_k)}-y_j
 $$
 
-## 1.6 分类精度
 
