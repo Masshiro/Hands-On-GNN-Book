@@ -2,3 +2,4 @@
 ml-100k/
 processed/
 raw/
+__pycache__/
