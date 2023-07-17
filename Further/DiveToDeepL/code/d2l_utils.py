@@ -177,7 +177,7 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater, draw=False)
     all_test_acc = []
 
     for epoch in range(num_epochs):
-        print("epoch ", epoch)
+        print("epoch ", epoch+1)
         train_metrics = train_epoch_ch3(net, train_iter, loss, updater)
         test_acc = evaluate_accuracy(net, test_iter)
         all_train_loss.append(train_metrics[0])

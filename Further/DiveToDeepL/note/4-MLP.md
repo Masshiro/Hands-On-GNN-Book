@@ -182,3 +182,44 @@ $$
 	<img src="https://raw.githubusercontent.com/Masshiro/TyporaImages/master/20230717140354.png" style="zoom:80%;" />
 
 	- 计算输出不再依赖$h_2$或$h_5$，其各自的梯度在执行反向传播时也会消失
+
+## 6 前向传播
+
+- 指：按顺序（从输入层到输出层）计算和存储神经网络中每层的结果
+
+- 假设输入样本是$\mathbf{x}\in\mathbb{R}^d$，且隐藏层不包含偏置项，则：
+
+	- 长度为$h$的隐藏激活向量，其中$\mathbf{W}^{(1)}\in\mathbb{R}^{h\times d}$：
+		$$
+		\mathbf{h}=\phi(\mathbf{z})=\phi(\mathbf{W}^{(1)}\mathbf{x})
+		$$
+
+	- 设输出层参数只有权重$\mathbf{W}^{(2)}\in\mathbb{R}^{q\times h}$，则输出层变量为一个长度为$q$的向量：
+		$$
+		\mathbf{o}=\mathbf{W}^{(2)}\mathbf{h}
+		$$
+
+	- 设损失函数为$l$，样本标签为$y$，则计算单个数据样本的损失项：
+		$$
+		L=l(\mathbf{o},y)
+		$$
+
+	- 根据$L_2$正则化定义，给定超参数$\lambda$，正则化项：
+		$$
+		s=\frac{\lambda}{2}\left(\Vert\mathbf{W}^{(1)}\Vert^2_F+\Vert\mathbf{W}^{(2)}\Vert^2_F \right)
+		$$
+
+	- 模型在给定数据样本上的正则化损失为：
+		$$
+		J=L+s
+		$$
+
+- 前向传播计算图
+
+	<img src="https://raw.githubusercontent.com/Masshiro/TyporaImages/master/20230717201833.png" style="zoom:80%;" />
+
+## 7 反向传播
+
+- 指：计算神经网络参数梯度的方法
+- 根据微积分中的链式规则，按相反的顺序从输出层到输入层遍历网络
+- 该算法存储了计算某些参数梯度时，所需的所有中间变量（偏导数）
