@@ -62,6 +62,27 @@ def plot_train_result(x, y, fs=(6,4), linenames=None, xlabel=None, ylabel=None, 
 """
 Chapter 3: Linear Regression
 """
+def synthetic_data(w, b, nums_examples):
+    """生成形如 y = Xw + b + noise 的数据集"""
+    X = torch.normal(0, 1, (nums_examples, len(w)))
+    y = torch.matmul(X, w) + b
+    y += torch.normal(0, 0.01, y.shape)
+    return X, y.reshape((-1, 1))
+
+def load_array(data_arrays, batch_size, is_train=True):
+    """构造一个PyTorch数据迭代器"""
+    dataset = data.TensorDataset(*data_arrays)
+    return data.DataLoader(dataset, batch_size, shuffle=is_train)
+
+def sgd(params, lr, batch_size):
+    """小批量随机梯度下降"""
+    with torch.no_grad():           # 上下文管理器来禁用自动求导功能，因为我们不需要计算参数的二阶导数
+        for param in params:
+            # 参数更新方法：
+            # 用参数当前的值减去学习率乘以参数当前的梯度除以小批量数据的大小
+            param -= lr * param.grad / batch_size
+            param.grad.zero_()
+
 def get_dataloader_workers():
     return 4
 
@@ -174,6 +195,19 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater, draw=False)
         linenames = ["train acc", "train loss", "test acc"]
         plot_train_result(x, y, linenames=linenames, xlabel="epoch", ylim=(0.2, 1.0), xlim=(0.5, 10.5), legend=True)
 
+
+"""
+Chapter 4: MLP
+"""
+def evaluate_loss(net, data_iter, loss):
+    """评估给定数据集上模型的损失""" 
+    metric = Accumulator(2) # 损失的总和,样本数量 
+    for X, y in data_iter:
+        out = net(X)
+        y = y.reshape(out.shape)
+        l = loss(out, y)
+        metric.add(l.sum(), l.numel()) 
+    return metric[0] / metric[1]
 
 
 
