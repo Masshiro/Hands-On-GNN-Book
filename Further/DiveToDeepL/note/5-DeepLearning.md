@@ -149,3 +149,90 @@
 	- 直到数据第⼀次通过模型传递时，框架才会<u>*动态地*</u>推断出每个层的⼤⼩
 	- 当使⽤卷积神经⽹络时，由于输⼊维度（即图像的分辨率）将影响每个后续层的维数，有了该技术将更加⽅便
 	- 在编写代码时⽆须知道维度是什么就可以设置参数，这种能⼒可以⼤⼤简化定义和修 改模型的任务
+
+# 3 读写文件
+
+- 运行一个耗时较长的深度学习模型时，最佳做法为定期保存中间过程
+
+## 3.1 加载和保存张量
+
+- 对于单个张量，调用`load`和`save`函数分别读写
+
+	- 两个函数都要求我们提供⼀个名称
+	- `save`要求将要保存的变量作为输⼊
+
+	```python
+	import torch
+	from torch import nn
+	from torch.nn import functional as F
+	
+	x = torch.arange(4)
+	torch.save(x, 'x-file')
+	
+	# 重新读回内存
+	x2 = torch.load('x-file')
+	torch.save(x, 'x-file')
+	x2
+	>> tensor([0, 1, 2, 3])
+	```
+
+- 可以存储一个**<u>张量列表</u>**，然后将其读回内存
+
+	```python
+	y = torch.zeros(4)
+	torch.save([x, y], 'x-files')
+	x2, y2 = torch.load('x-files')
+	(x2, y2)
+	>> (tensor([0, 1, 2, 3]), tensor([0., 0., 0., 0.]))
+	```
+
+- 可以写入或读取从**<u>字符串映射到张量的字典</u>**
+
+	- 当需要读取或写入模型中的所有权重时很方便
+
+	```python
+	mydict = {'x': x, 'y': y}
+	torch.save(mydict, 'mydict')
+	mydict = torch.load('mydict')
+	mydict2
+	>> {'x': tensor([0, 1, 2, 3]), 'y': tensor([0., 0., 0., 0.])}
+	```
+
+## 3.2 加载和保存模型参数
+
+- 深度学习框架提供了内置函数来保存和加载整个⽹络
+
+- 将保存模型的参数**<u>*⽽不是*</u>**保存整个模型
+
+- 模型本身难以序列化
+
+	- 为了恢复模型，需用代码生成架构，然后从磁盘加载参数
+
+- 以MLP为例；
+
+	```python
+	class MLP(nn.Module):
+	    def __init__(self):
+	        super().__init__()
+	        self.hidden = nn.Linear(20, 256)
+	        self.output = nn.linear(256, 10)
+	       
+	    def forward(self, x):
+	        return self.output(F.relu(self.hidden(x)))
+	
+	net = MLP()
+	X = torch.randn(size=(2, 20))
+	Y = net(X)
+	torch.save(net.state_dict(), 'mlp.params') # 存储模型参数
+	
+	clone = MLP()
+	clone.load_state_dict(torch.load('mlp.params'))
+	clone.eval()
+	>> MLP( 
+	    (hidden): Linear(in_features=20, out_features=256, bias=True) 
+	    (output): Linear(in_features=256, out_features=10, bias=True))
+	```
+
+# 4 其余内容
+
+参数管理&自定义层均在`5-1-ParamsManage.ipynb`中记录
