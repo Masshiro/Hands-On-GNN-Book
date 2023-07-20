@@ -85,6 +85,8 @@
 
 ![](https://raw.githubusercontent.com/Masshiro/TyporaImages/master/20230719165325.png)
 
+- 计算规则：$0\times 0+1\times 1+3\times2+4\times3=19$
+
 **输入输出大小关系：**
 
 - 输出大小略小于输入大小
@@ -120,4 +122,49 @@
 
 - 添加通道时，输入和隐藏的表示均为三维张量
 	- 如：每个RGB输入图像具有$3\times h\times w$的形状
-	- 大小为$3$的轴称为通道维度
+	- 将该大小为$3$的轴称为通道维度
+
+## 4.1 多输入通道
+
+- 需要构造一个和输入通道数相同的卷积核
+
+	- 均为$c_i$
+
+- 若卷积核的窗口形状为$k_h\times k_w$，则当$c_i=1$时，可将卷积核视为$k_h\times k_w$的二维张量
+
+- 以双通道为例：
+
+	![](https://raw.githubusercontent.com/Masshiro/TyporaImages/master/20230720160921.png)
+
+## 4.2 多输出通道
+
+- 直观讲：可将每个通道看作对不同特征的响应
+- 现实更复杂：每个通道并非独立学习，而是为了共同使用而优化
+- 符号表示：
+	- $c_i$，$c_o$：输入和输出通道的数目
+	- 为每个输出通道创建$c_i\times k_h\times k_w$的卷积核张量
+	- 卷积核形状：$c_o\times c_i\times k_h\times k_w$
+- ==计算规则==：每个输出通道先获取所有输入通道，再以对应该输出通道的卷积核进行计算
+
+## 4.3 $1\times 1$卷积核
+
+- 缺点：失去了卷积层的特有能⼒——在⾼度和宽度维度上，识别相邻元素间相互作⽤的能⼒
+
+	![](https://raw.githubusercontent.com/Masshiro/TyporaImages/master/20230720163229.png)
+
+	- 可将$1\times 1$卷积层视为在每个像素位置应用的全链接层，以$c_i$个输入值转换为$c_o$个输出值
+
+# 4 汇聚层
+
+- 最后一层的神经元应对整个输入的全局敏感
+
+- 通过逐渐聚合信息，生成越来越粗糙的映射，最终实现全局表示的目标
+
+- 汇聚层目的：
+
+	- 降低卷积层对位置的敏感性
+	- 降低对空间降采样表示的敏感性
+
+	![](https://raw.githubusercontent.com/Masshiro/TyporaImages/master/20230720165451.png)
+
+	
