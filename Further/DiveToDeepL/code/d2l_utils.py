@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 
 """
-画图相关
+通用代码
 """
 # def use_svg_display():
 #     """使⽤svg格式在Jupyter中显⽰绘图"""
@@ -59,6 +59,24 @@ def plot_train_result(x, y, fs=(6,4), linenames=None, xlabel=None, ylabel=None, 
         plt.xlim(xlim)
     plt.show()
 
+def get_device():
+    if torch.cuda.is_available():
+        return torch.device('cuda')
+    elif torch.backends.mps.is_available():
+        return torch.device('mps')
+    else:
+        return torch.device('cpu')
+
+
+def set_device(dev):
+    if dev == "cude" and torch.cuda.is_available():
+        return torch.device('cuda')
+    elif dev == "mps" and torch.backends.mps.is_available():
+        return torch.device('mps')
+    else:
+        return torch.device('cpu')
+
+
 """
 Chapter 3: Linear Regression
 """
@@ -92,7 +110,7 @@ def get_fashion_mnist_labels(labels):
                    'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot'] 
     return [text_labels[int(i)] for i in labels]
 
-def load_data_fashion_mnist(batch_size, resize=None):
+def load_data_fashion_mnist(batch_size, resize=None, workers=4):
     trans = [transforms.ToTensor()]
     if resize:
         trans.insert(0, transforms.Resize(resize))
@@ -102,9 +120,9 @@ def load_data_fashion_mnist(batch_size, resize=None):
     mnist_test = torchvision.datasets.FashionMNIST(
         root="../../dataset", train=False, transform=trans, download=True)
     return (data.DataLoader(mnist_train, batch_size, shuffle=True,
-                            num_workers=get_dataloader_workers()),
+                            num_workers=workers),
             data.DataLoader(mnist_test, batch_size, shuffle=False,
-                            num_workers=get_dataloader_workers()))
+                            num_workers=workers))
 
 class Accumulator:
     """在n个变量上累加"""
@@ -209,8 +227,27 @@ def evaluate_loss(net, data_iter, loss):
         metric.add(l.sum(), l.numel()) 
     return metric[0] / metric[1]
 
-
-
+"""
+Chapter 6: CNN
+"""
+def evaluate_accuracy_gpu(net, data_iter, device=None): #@save
+    """使用GPU计算模型在数据集上的精度"""
+    if isinstance(net, nn.Module):
+        net.eval()  # 设置为评估模式
+        if not device:
+            device = next(iter(net.parameters())).device
+    # 正确预测的数量，总预测的数量
+    metric = Accumulator(2)
+    with torch.no_grad():
+        for X, y in data_iter:
+            if isinstance(X, list):
+                # BERT微调所需的（之后将介绍）
+                X = [x.to(device) for x in X]
+            else:
+                X = X.to(device)
+            y = y.to(device)
+            metric.add(accuracy(net(X), y), y.numel())
+    return metric[0] / metric[1]
 
 
 
