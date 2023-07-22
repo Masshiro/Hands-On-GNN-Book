@@ -83,4 +83,4 @@ if __name__ == "__main__":
     #     X = layer(X)
     #     print(layer.__class__.__name__,'output shape:\t', X.shape)
     lr, num_epochs = 0.01, 10
-    train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.set_device())
+    train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.get_device())
