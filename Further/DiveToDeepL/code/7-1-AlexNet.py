@@ -29,7 +29,7 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr, device):
         net.train()
         for i, (X, y) in enumerate(train_iter):
             optimizer.zero_grad()
-            X, y = X.to(device), y.to(device)
+            # X, y = X.to(device), y.to(device)
             y_hat = net(X)
             l = loss(y_hat, y)
             l.backward()
@@ -38,7 +38,8 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr, device):
                 metric.add(l * X.shape[0], d2l.accuracy(y_hat, y), X.shape[0])
             train_l = metric[0] / metric[2]
             train_acc = metric[1] / metric[2]
-            test_acc = d2l.evaluate_accuracy_gpu(net, test_iter)
+            # test_acc = d2l.evaluate_accuracy_gpu(net, test_iter)
+            test_acc = d2l.evaluate_accuracy(net, test_iter)
             if (i + 1) % (num_batches // 5) == 0 or i == num_batches - 1:
                 # print(f"\t batch {i+1}")
                 print(f'\t Batch {i+1}:\t train loss: {train_l:>.3f} | train acc: {train_acc:>.3f} | test acc: {test_acc:>.3f}') 
@@ -82,4 +83,4 @@ if __name__ == "__main__":
     #     X = layer(X)
     #     print(layer.__class__.__name__,'output shape:\t', X.shape)
     lr, num_epochs = 0.01, 10
-    train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.get_device())
+    train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.set_device())

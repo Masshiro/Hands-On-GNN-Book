@@ -68,7 +68,7 @@ def get_device():
         return torch.device('cpu')
 
 
-def set_device(dev):
+def set_device(dev='cpu'):
     if dev == "cude" and torch.cuda.is_available():
         return torch.device('cuda')
     elif dev == "mps" and torch.backends.mps.is_available():
