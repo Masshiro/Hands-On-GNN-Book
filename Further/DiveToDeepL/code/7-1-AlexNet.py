@@ -39,7 +39,7 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr, device):
             train_l = metric[0] / metric[2]
             train_acc = metric[1] / metric[2]
             test_acc = d2l.evaluate_accuracy_gpu(net, test_iter)
-            test_acc = d2l.evaluate_accuracy(net, test_iter)
+            # test_acc = d2l.evaluate_accuracy(net, test_iter)
             if (i + 1) % (num_batches // 5) == 0 or i == num_batches - 1:
                 # print(f"\t batch {i+1}")
                 print(f'\t Batch {i+1}:\t train loss: {train_l:>.3f} | train acc: {train_acc:>.3f} | test acc: {test_acc:>.3f}') 
